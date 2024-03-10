@@ -18,15 +18,13 @@ services:
       - MONGO_PORT=${MONGO_PORT}
       - MONGO_HOST=wol-db
       - MONGO_DBNAME=wol
+      - TOKEN_SECRET=${TOKEN_SECRET}
+      - ADMIN_PW=${ADMIN_PW}
     depends_on:
       - wol-db
     ports:
       - "3500:3500"
-    env_file:
-      - ./.env
   wol-db:
     image: mongo:latest
     container_name: wol-db
     restart: unless-stopped
-    env_file:
-      - ./.env
