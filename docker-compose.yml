@@ -1,0 +1,32 @@
+version: "3"
+services:
+  wol-frontend:
+    container_name: wol-frontend
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - wol-db
+  wol-backend:
+    container_name: wol-backend
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_HOST=wol-db
+      - MONGO_DBNAME=wol
+    depends_on:
+      - wol-db
+    ports:
+      - "3500:3500"
+    env_file:
+      - ./.env
+  wol-db:
+    image: mongo:latest
+    container_name: wol-db
+    restart: unless-stopped
+    env_file:
+      - ./.env
