@@ -1,5 +1,20 @@
 # Full-stack application to wake your devices on your LAN
 
+### Database Setup
+
+This app uses MongoDB. A local instance can be ran using Docker, the included `mongo.sh` script spins up a MongoDB instance on localhost:27017. This instance does not auto start on setup. Do start an existing instance, assuming the name of the container is `mongo`:
+
+```bash
+docker start mongo
+```
+
+#### Setup a new Database with Schema
+
+The app uses a database named `wol`, and uses two mongoDB collections:
+
+- devices
+- users
+
 ### Deployment
 Create a .env file at the root of the project containing the following:
 ```

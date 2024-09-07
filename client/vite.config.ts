@@ -7,6 +7,15 @@ dotenv.config()
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3500',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, '')
+            }
+        }
+    },
     plugins: [react()],
     resolve: {
         alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
