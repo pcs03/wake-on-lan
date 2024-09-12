@@ -1,9 +1,10 @@
 import 'dotenv/config';
 import { NextFunction, Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcrypt, { genSalt } from 'bcrypt';
 
 import { User } from './../schema/schema';
+import { SafeUserDocument } from '../../types/custom';
 
 async function generateJwt(userid: string, hash: string, expSeconds: number): Promise<string> {
     const tokenSecret = process.env.TOKEN_SECRET;
@@ -15,67 +16,84 @@ async function generateJwt(userid: string, hash: string, expSeconds: number): Pr
     }
 }
 
-const registerUser = async (req: Request, res: Response) => {
-    const { username, password, adminpassword } = req.body;
+const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { username, password } = req.body;
 
-    const adminPasswordHash = process.env.ADMIN_PW;
-
-    if (!adminPasswordHash) {
-        console.error('Could not read ADMIN_PW env variable');
-        res.status(500);
-        return;
+    if (!username || !password) {
+        res.status(400);
+        next(new Error('Please fill in all fields'));
     }
 
-    if (!adminpassword) {
-        console.error('No admin password provided');
-        res.status(403).json({ status: 'No admin password provided' });
-        return;
+    const userExists = await User.findOne({ username });
+
+    if (userExists) {
+        res.status(400);
+        next(new Error('User already exists'));
     }
 
-    const adminPasswordMatch = await bcrypt.compare(adminpassword, adminPasswordHash);
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
 
-    if (!adminPasswordMatch) {
-        console.error('Incorrect admin password');
-        res.status(403).json({ status: 'Incorrect admin password' });
-        return;
-    }
+    const user = await User.create({
+        username,
+        password: passwordHash,
+    });
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    try {
-        const user = await User.create({
-            username: username,
-            password: passwordHash,
-            devices: [],
+    if (user) {
+        const jwtExpSeconds = 86400;
+        const jwtToken = await generateJwt(user._id.toString(), user.password, jwtExpSeconds);
+
+        res.status(201).json({
+            _id: user.id,
+            username: user.username,
+            token: jwtToken,
+            exp: jwtExpSeconds,
         });
-
-        console.log(user);
-        res.status(200).json({ status: user });
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({ status: error });
+    } else {
+        res.status(400);
+        next(new Error('Invalid user data.'));
     }
 };
 
-const loginUser = async (req: Request, res: Response) => {
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     const { username, password } = req.body;
+
+    if (!username || !password) {
+        res.status(400);
+        next(new Error('Please fill in all fields'));
+        return;
+    }
 
     const user = await User.findOne({ username });
 
-    if (!user) {
-        console.error(`No user found for username "${username}"`);
-        res.status(401).json({ success: false });
-        return;
-    }
-
-    const match = await bcrypt.compare(password, user.password);
-
-    if (match) {
+    if (user && (await bcrypt.compare(password, user.password))) {
         const jwtExpSeconds = 86400;
         const jwtToken = await generateJwt(user._id.toString(), user.password, jwtExpSeconds);
-        res.status(200).json({ success: true, token: jwtToken, exp: jwtExpSeconds });
+
+        res.status(200).json({
+            _id: user.id,
+            username: user.username,
+            token: jwtToken,
+            exp: jwtExpSeconds,
+        });
     } else {
-        res.status(401).json({ success: false });
+        res.status(401);
+        next(new Error('Invalid credentials'));
     }
 };
 
-export { loginUser, registerUser };
+const getMe = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+        res.status(400);
+        next(new Error('No user object included'));
+        return;
+    }
+    const { _id, username } = (await User.findById(req.user._id)) as SafeUserDocument;
+
+    res.status(200).json({
+        id: _id,
+        username: username,
+    });
+};
+
+export { loginUser, registerUser, getMe };

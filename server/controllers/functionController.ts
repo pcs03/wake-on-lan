@@ -5,36 +5,38 @@ import ping from 'ping';
 import { wake } from 'wol';
 import { exec } from 'child_process';
 
-import { User } from './../schema/schema';
+import { Device, User } from './../schema/schema';
+import { SafeUserDocument } from '../../types/custom';
 
-const pingDevice = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const cookies = req.cookies;
-    const jwt = cookies._auth;
-    const jwtSecret = process.env.TOKEN_SECRET;
+const pingDevice = async (req: Request, res: Response, next: NextFunction) => {
+    const deviceId = req.params.id;
 
-    if (!jwtSecret) {
-        console.error('No JWT secret token could be read');
-        res.status(500);
+    if (!req.user) {
+        res.status(401);
+        next(new Error('No user given'));
         return;
     }
 
-    const jwtItems = verify(jwt, jwtSecret);
-    const userid = (jwtItems as JwtPayload).userid;
-    const user = await User.findById(userid);
+    const user = (await User.findById(req.user._id)) as SafeUserDocument;
+    const userid = user._id;
 
-    if (!user) {
-        console.error('User not found for getDevices method');
-        res.status(400);
+    if (!userid) {
+        res.status(401);
+        next(new Error('No user id found'));
         return;
     }
 
-    const userDevices = user.devices;
-    const device = userDevices.find((device) => device._id?.toString() === id.toString());
+    const device = await Device.findById(deviceId);
 
     if (!device) {
-        console.error(`No device found for id ${id}`);
         res.status(400);
+        next(new Error(`No device found for id ${deviceId}`));
+        return;
+    }
+
+    if (device.userid.toString() !== userid.toString()) {
+        res.status(401);
+        next(new Error('Not authorized'));
         return;
     }
 
@@ -45,34 +47,35 @@ const pingDevice = async (req: Request, res: Response) => {
     res.status(200).json({ status: alive });
 };
 
-const wolDevice = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const cookies = req.cookies;
-    const jwt = cookies._auth;
-    const jwtSecret = process.env.TOKEN_SECRET;
+const wolDevice = async (req: Request, res: Response, next: NextFunction) => {
+    const deviceId = req.params.id;
 
-    if (!jwtSecret) {
-        console.error('No JWT secret token could be read');
-        res.status(400);
+    if (!req.user) {
+        res.status(401);
+        next(new Error('No user given'));
         return;
     }
 
-    const jwtItems = verify(jwt, jwtSecret);
-    const userid = (jwtItems as JwtPayload).userid;
-    const user = await User.findById(userid);
+    const user = (await User.findById(req.user._id)) as SafeUserDocument;
+    const userid = user._id;
 
-    if (!user) {
-        console.error('User not found for getDevices method');
-        res.status(400);
+    if (!userid) {
+        res.status(401);
+        next(new Error('No user id found'));
         return;
     }
 
-    const userDevices = user.devices;
-    const device = userDevices.find((device) => device._id?.toString() === id.toString());
+    const device = await Device.findById(deviceId);
 
     if (!device) {
-        console.error(`No device found for id ${id}`);
-        res.status(400).json({ status: 'No device found for given id' });
+        res.status(400);
+        next(new Error(`No device found for id ${deviceId}`));
+        return;
+    }
+
+    if (device.userid.toString() !== userid.toString()) {
+        res.status(401);
+        next(new Error('Not authorized'));
         return;
     }
 
@@ -87,34 +90,35 @@ const wolDevice = async (req: Request, res: Response) => {
     });
 };
 
-const shutdownDevice = async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const cookies = req.cookies;
-    const jwt = cookies._auth;
-    const jwtSecret = process.env.TOKEN_SECRET;
+const shutdownDevice = async (req: Request, res: Response, next: NextFunction) => {
+    const deviceId = req.params.id;
 
-    if (!jwtSecret) {
-        console.error('No JWT secret token could be read');
-        res.status(500);
+    if (!req.user) {
+        res.status(401);
+        next(new Error('No user given'));
         return;
     }
 
-    const jwtItems = verify(jwt, jwtSecret);
-    const userid = (jwtItems as JwtPayload).userid;
-    const user = await User.findById(userid);
+    const user = (await User.findById(req.user._id)) as SafeUserDocument;
+    const userid = user._id;
 
-    if (!user) {
-        console.error('User not found for getDevices method');
-        res.status(400).json({ status: 'No user found' });
+    if (!userid) {
+        res.status(401);
+        next(new Error('No user id found'));
         return;
     }
 
-    const userDevices = user.devices;
-    const device = userDevices.find((device) => device._id?.toString() === id.toString());
+    const device = await Device.findById(deviceId);
 
     if (!device) {
-        console.error(`No device found for id ${id}`);
-        res.status(400).json({ status: 'No devices found for id' });
+        res.status(400);
+        next(new Error(`No device found for id ${deviceId}`));
+        return;
+    }
+
+    if (device.userid.toString() !== userid.toString()) {
+        res.status(401);
+        next(new Error('Not authorized'));
         return;
     }
 

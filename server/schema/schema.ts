@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const deviceSchema = new mongoose.Schema({
-    username: {
+    userid: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User',
@@ -38,7 +38,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please add a password'],
         },
-        devices: [deviceSchema],
     },
     {
         timestamps: true,

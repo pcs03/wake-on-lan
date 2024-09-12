@@ -6,16 +6,17 @@ import {
   updateDevice,
   removeDevice,
 } from '../controllers/deviceController';
+import { protect } from '../middleware/authMiddleware';
 
 const deviceRouter = Router();
 
-deviceRouter.get('/', getDevices);
-deviceRouter.get('/:id', getDeviceById);
+deviceRouter.get('/', protect, getDevices);
+deviceRouter.get('/:id', protect, getDeviceById);
 
-deviceRouter.post('/', createDevice);
+deviceRouter.post('/', protect, createDevice);
 
-deviceRouter.put('/:id', updateDevice);
+deviceRouter.put('/:id', protect, updateDevice);
 
-deviceRouter.delete('/:id', removeDevice);
+deviceRouter.delete('/:id', protect, removeDevice);
 
 export default deviceRouter;
