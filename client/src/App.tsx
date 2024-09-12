@@ -1,11 +1,11 @@
-import { ColorModeContext, useMode } from "./theme";
-import { CssBaseline, ThemeProvider, Box } from "@mui/material";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Navbar from "@/scenes/Navbar/Navbar";
-import Home from "./scenes/Home/Home";
-import { AuthProvider, RequireAuth } from "react-auth-kit";
-import Login from "./scenes/Login/Login";
-import React from 'react'
+import { ColorModeContext, useMode } from './theme';
+import { CssBaseline, ThemeProvider, Box } from '@mui/material';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Navbar from '@/scenes/Navbar/Navbar';
+import Home from './scenes/Home/Home';
+import { AuthProvider, RequireAuth } from 'react-auth-kit';
+import Login from './scenes/Login/Login';
+import React from 'react';
 
 const App: React.FC = () => {
     const [theme, colorMode] = useMode();

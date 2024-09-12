@@ -91,7 +91,7 @@ const Device: React.FC<DeviceProps> = ({ device, onUpdate }) => {
     }
 
     async function rmDevice() {
-        console.log(device)
+        console.log(device);
         const confirm = window.confirm('Are you sure you want to delete this device?');
         if (confirm) {
             const response = await fetch(`http://${process.env.API_HOST}/devices/${device._id}`, {

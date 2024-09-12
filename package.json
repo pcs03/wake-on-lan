@@ -6,6 +6,7 @@
     "scripts": {
         "start": "npx tsc && node ./build/app.js",
         "server": "concurrently \"npx tsc --watch\" \"nodemon -q build/app.js\"",
+        "client": "npm run dev --prefix client",
         "lint": "eslint . --ext .ts"
     },
     "author": "",
