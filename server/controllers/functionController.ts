@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { NextFunction, Request, Response } from 'express';
-import { JwtPayload, verify } from 'jsonwebtoken';
 import ping from 'ping';
 import { wake } from 'wol';
 import { exec } from 'child_process';

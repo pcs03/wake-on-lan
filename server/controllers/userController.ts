@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { NextFunction, Request, Response } from 'express';
 import { sign } from 'jsonwebtoken';
-import bcrypt, { genSalt } from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 import { User } from './../schema/schema';
 import { SafeUserDocument } from '../../types/custom';

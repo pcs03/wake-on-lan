@@ -4,7 +4,7 @@ export const errorHandler = (
     err: Error,
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction // This needs to be here for the function to be recognized as middleware
 ) => {
     const statusCode = res.statusCode ? res.statusCode : 500;
 
