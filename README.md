@@ -15,6 +15,9 @@ The app uses a database named `wol`, and uses two mongoDB collections:
 - devices
 - users
 
+This will be created automatically through mongoose.
+
+
 ### Deployment
 Create a .env file at the root of the project containing the following:
 ```
