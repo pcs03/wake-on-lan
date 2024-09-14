@@ -6,6 +6,8 @@ import Home from './scenes/Home/Home';
 import { AuthProvider, RequireAuth } from 'react-auth-kit';
 import Login from './scenes/Login/Login';
 import React from 'react';
+import Register from './scenes/Register/Register';
+import { ToastContainer } from 'react-toastify';
 
 const App: React.FC = () => {
     const [theme, colorMode] = useMode();
@@ -34,9 +36,11 @@ const App: React.FC = () => {
                                         }
                                     />
                                     <Route path="/login" element={<Login />} />
+                                    <Route path="/register" element={<Register />} />
                                 </Routes>
                             </Box>
                         </BrowserRouter>
+                        <ToastContainer />
                     </AuthProvider>
                 </div>
             </ThemeProvider>
