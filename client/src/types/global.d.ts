@@ -15,6 +15,13 @@ declare type DeviceInputFields = {
     mac: string;
 };
 
+declare type User = {
+    _id: string;
+    username: string;
+    token: string;
+    exp: int;
+};
+
 declare type option = {
     label: string;
     value: string;
