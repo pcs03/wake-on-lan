@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const colorMode = useContext(ColorModeContext);
-    const [selected, setSelected] = useState<'home' | 'other page'>('home');
+    const [selected, setSelected] = useState<'home' | 'login' | 'register'>('home');
 
     return (
         <FlexBetween mb="0.25rem" p="0.5rem 0rem" color={colors.primary[100]}>
@@ -30,11 +30,35 @@ const Navbar: React.FC = () => {
                         to="/"
                         onClick={() => setSelected('home')}
                         style={{
-                            color: selected === 'home' ? 'inherit' : colors.primary[500],
+                            color: selected === 'home' ? colors.primary[300] : colors.primary[200],
                             textDecoration: 'inherit',
                         }}
                     >
                         Home
+                    </Link>
+                </Box>
+                <Box sx={{ '&:hover': { color: colors.blueAccent[500] } }}>
+                    <Link
+                        to="/login"
+                        onClick={() => setSelected('login')}
+                        style={{
+                            color: selected === 'login' ? colors.primary[300] : colors.primary[200],
+                            textDecoration: 'inherit',
+                        }}
+                    >
+                        Login
+                    </Link>
+                </Box>
+                <Box sx={{ '&:hover': { color: colors.blueAccent[500] } }}>
+                    <Link
+                        to="/register"
+                        onClick={() => setSelected('register')}
+                        style={{
+                            color: selected === 'register' ? colors.primary[300] : colors.primary[200],
+                            textDecoration: 'inherit',
+                        }}
+                    >
+                        Register
                     </Link>
                 </Box>
                 <IconButton onClick={colorMode.toggleColorMode}>
