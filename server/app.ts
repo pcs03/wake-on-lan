@@ -20,7 +20,6 @@ app.use(
     }),
 );
 app.use(cookieParser());
-app.use(errorHandler);
 
 const allowedOrigins = [
     'http://localhost:5173',
@@ -48,13 +47,12 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions));
 
-// app.use(router);
-
 app.use('/api/devices', deviceRouter);
 app.use('/api/users', userRouter);
 app.use("/api/", functionRouter);
 
 app.use(express.static(process.cwd() + './../../client/dist/'));
+app.use(errorHandler);
 
 const port = process.env.PORT || 5000;
 app.listen(process.env.PORT, (): void => {

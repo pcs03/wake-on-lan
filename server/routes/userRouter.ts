@@ -5,7 +5,7 @@ import { protect } from '../middleware/authMiddleware';
 const userRouter = Router();
 
 userRouter.post('/', registerUser);
-userRouter.get('/login', loginUser);
+userRouter.post('/login', loginUser);
 userRouter.get('/me', protect, getMe);
 
 export default userRouter;
