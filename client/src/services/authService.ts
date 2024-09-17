@@ -19,7 +19,7 @@ const login = async (payload: UserFormFields): Promise<boolean> => {
 };
 
 const register = async (payload: { username: string; password: string }) => {
-    const response = await fetch('/api/users', {
+    const response = await fetch('/api/users/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
