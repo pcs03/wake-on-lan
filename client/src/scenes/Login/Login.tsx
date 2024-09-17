@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import { tokens } from '@/theme';
@@ -21,6 +21,13 @@ const Login: React.FC = () => {
     const { handleSubmit, control, setError } = useForm<UserFormFields>({
         defaultValues: defaultValues,
     });
+
+    useEffect(() => {
+        if (user) {
+            navigate('/');
+            return;
+        }
+    }, [user]);
 
     // async function login(payload: { username: string; password: string }) {
     //     console.log(payload);
@@ -64,7 +71,6 @@ const Login: React.FC = () => {
             setError('password', { type: 'custom', message: loginStatus.error });
 
             // TODO: toast
-
 
             return;
         }

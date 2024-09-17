@@ -6,12 +6,15 @@ import LanIcon from '@mui/icons-material/Lan';
 import { ColorModeContext, tokens } from '../../theme';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../../hooks/useAuth';
 
 const Navbar: React.FC = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const colorMode = useContext(ColorModeContext);
     const [selected, setSelected] = useState<'home' | 'login' | 'register'>('home');
+    const { login, register, logout } = useAuth();
 
     return (
         <FlexBetween mb="0.25rem" p="0.5rem 0rem" color={colors.primary[100]}>
@@ -61,6 +64,9 @@ const Navbar: React.FC = () => {
                         Register
                     </Link>
                 </Box>
+                <IconButton onClick={logout}>
+                    <LogoutIcon />
+                </IconButton>
                 <IconButton onClick={colorMode.toggleColorMode}>
                     {theme.palette.mode === 'dark' ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
                 </IconButton>

@@ -15,6 +15,13 @@ declare type DeviceInputFields = {
     mac: string;
 };
 
+interface ServiceResponse<T> {
+    success: boolean;
+    status: number;
+    errorMessage?: string;
+    data?: T;
+}
+
 declare type UserFormFields = {
     username: string;
     password: string;

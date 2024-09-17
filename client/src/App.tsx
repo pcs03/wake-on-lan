@@ -7,18 +7,17 @@ import Login from './scenes/Login/Login';
 import React from 'react';
 import Register from './scenes/Register/Register';
 import { ToastContainer } from 'react-toastify';
-import { AuthContext } from './context/AuthContext';
-import { useAuth } from './hooks/useAuth';
+import { AuthProvider } from './context/AuthContext';
+import Protected from './components/Protected';
 
 const App: React.FC = () => {
     const [theme, colorMode] = useMode();
-    const { user, setUser } = useAuth();
 
     return (
         <ColorModeContext.Provider value={colorMode}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <AuthContext.Provider value={{ user, setUser }}>
+                <AuthProvider>
                     <div className="app">
                         <BrowserRouter>
                             <Box width="100%" height="100%" p="1rem 0.5rem 4rem 0.5rem">
@@ -32,7 +31,7 @@ const App: React.FC = () => {
                         </BrowserRouter>
                         <ToastContainer />
                     </div>
-                </AuthContext.Provider>
+                </AuthProvider>
             </ThemeProvider>
         </ColorModeContext.Provider>
     );

@@ -1,58 +1,67 @@
-import { useEffect } from 'react';
-import { useLocalStorage } from './useLocalStorage';
-import { useUser } from './useUser';
+import { useContext, useEffect } from 'react';
 import authService from '../services/authService';
+import { AuthContext } from '../context/AuthContext';
+
+interface AuthResponse {
+    success: boolean;
+    errorCode?: number;
+    errorMessage?: string;
+}
 
 export const useAuth = () => {
-    const { user, setUser, removeUser, addUser } = useUser();
-    const { getItem } = useLocalStorage();
+    const { user, setUser } = useContext(AuthContext);
 
     useEffect(() => {
-        const user = getItem('user');
+        const user = localStorage.getItem('user');
+
+        console.log(user);
+
         if (user) {
-            addUser(JSON.parse(user));
+            setUser(JSON.parse(user));
         }
-    }, [addUser, getItem]);
+    }, []);
 
-    const register = async (user: UserFormFields) => {
-        const userCredentials = await authService.register(user);
+    const register = async (user: UserFormFields): Promise<AuthResponse> => {
+        const userServiceResponse = await authService.register(user);
 
-        addUser(userCredentials);
+        if (!userServiceResponse.success || !userServiceResponse.data) {
+            return {
+                success: false,
+                errorCode: userServiceResponse.status,
+                errorMessage: userServiceResponse.errorMessage,
+            };
+        }
+
+        setUser(userServiceResponse.data);
+        localStorage.setItem('user', JSON.stringify(userServiceResponse.data));
+        return {
+            success: true,
+        };
     };
 
     const login = async (user: UserFormFields) => {
-        try {
-            const response = await fetch('/api/users/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(user),
-            });
+        const userServiceResponse = await authService.login(user);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-
-                return {
-                    success: false,
-                    error: errorData.message || 'Unknown error occurred',
-                };
-            }
-
-            const data = await response.json();
-            await addUser(data);
-            return { success: true };
-        } catch (error) {
+        if (!userServiceResponse.success || !userServiceResponse.data) {
             return {
                 success: false,
-                error: error instanceof Error ? error.message : 'Unknown error occurred',
+                errorCode: userServiceResponse.status,
+                errorMessage: userServiceResponse.errorMessage,
             };
         }
+
+        setUser(userServiceResponse.data);
+        localStorage.setItem('user', JSON.stringify(userServiceResponse.data));
+
+        return {
+            success: true,
+        };
     };
 
     const logout = () => {
-        removeUser();
+        setUser(null);
+        localStorage.removeItem('user');
     };
 
-    return { user, register, login, logout, setUser };
+    return { user, setUser, register, login, logout };
 };
