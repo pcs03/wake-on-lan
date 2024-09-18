@@ -8,7 +8,6 @@ import React from 'react';
 import Register from './scenes/Register/Register';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
-import Protected from './components/Protected';
 
 const App: React.FC = () => {
     const [theme, colorMode] = useMode();
