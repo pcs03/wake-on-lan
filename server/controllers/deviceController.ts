@@ -2,18 +2,21 @@ import 'dotenv/config';
 import { NextFunction, Request, Response } from 'express';
 import { User, Device } from './../schema/schema';
 import { SafeUserDocument } from '../../types/custom';
+import { regex } from './../../shared/constants';
 
 const getDevices = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-        res.status(400);
+        res.status(401);
         next(new Error('No user given'));
         return;
     }
 
+    console.log(req.user);
+
     const { _id } = (await User.findById(req.user._id)) as SafeUserDocument;
 
     if (!_id) {
-        res.status(400);
+        res.status(401);
         next(new Error('No user id found'));
         return;
     }
@@ -61,8 +64,32 @@ const getDeviceById = async (req: Request, res: Response, next: NextFunction) =>
 const createDevice = async (req: Request, res: Response, next: NextFunction) => {
     const { devicename, deviceuser, ip, mac, devicetype } = req.body;
 
-    if (!req.user) {
+    if (!(devicename && deviceuser && ip && mac && devicetype)) {
         res.status(400);
+        next(new Error('Fill in all fields'));
+        return;
+    }
+
+    if (!regex.username.test(deviceuser)) {
+        res.status(400);
+        next(new Error('Incorrect deviceuser format'));
+        return;
+    }
+
+    if (!regex.ip.test(ip)) {
+        res.status(400);
+        next(new Error('Incorrect ip format'));
+        return;
+    }
+
+    if (!regex.mac.test(mac)) {
+        res.status(400);
+        next(new Error('Incorrect mac format'));
+        return;
+    }
+
+    if (!req.user) {
+        res.status(401);
         next(new Error('No user given'));
         return;
     }
@@ -70,7 +97,7 @@ const createDevice = async (req: Request, res: Response, next: NextFunction) => 
     const { _id } = (await User.findById(req.user._id)) as SafeUserDocument;
 
     if (!_id) {
-        res.status(400);
+        res.status(401);
         next(new Error('No user id found'));
         return;
     }
@@ -90,6 +117,30 @@ const createDevice = async (req: Request, res: Response, next: NextFunction) => 
 const updateDevice = async (req: Request, res: Response, next: NextFunction) => {
     const deviceId = req.params.id;
     const { devicename, deviceuser, ip, mac, devicetype } = req.body;
+
+    if (!(devicename && deviceuser && ip && mac && devicetype)) {
+        res.status(400);
+        next(new Error('Fill in all fields'));
+        return;
+    }
+
+    if (!regex.username.test(deviceuser)) {
+        res.status(400);
+        next(new Error('Incorrect deviceuser format'));
+        return;
+    }
+
+    if (!regex.ip.test(ip)) {
+        res.status(400);
+        next(new Error('Incorrect ip format'));
+        return;
+    }
+
+    if (!regex.mac.test(mac)) {
+        res.status(400);
+        next(new Error('Incorrect mac format'));
+        return;
+    }
 
     if (!req.user) {
         res.status(401);
